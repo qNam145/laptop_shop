@@ -13,6 +13,9 @@ public class Role {
      private String name;
      private String description;
 
+     @OneToMany(mappedBy = "role")
+     private List<User> users;
+
      // region getters and setters
      public long getId() {
           return id;

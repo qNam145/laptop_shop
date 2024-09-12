@@ -1,6 +1,10 @@
 package vn.hoidanit.laptopshop.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
@@ -8,12 +12,25 @@ public class User {
      @Id
      @GeneratedValue(strategy = GenerationType.IDENTITY)
      private long id;
+
+     @NotNull
+     @Email(message = "Email is not valid", regexp = "^[A-Za-z0-9+_.-]+@(.+)$")
      private String email;
+
+     @NotNull
+     @Size(min = 3, message = "Password must be at least 3 characters")
      private String password;
+
+     @NotNull
+     @Size(min = 2, message = "Name must be at least 2 characters")
      private String fullName;
      private String address;
      private String phone;
      private String avatar;
+
+     @ManyToOne
+     @JoinColumn(name = "role_id")
+     private Role role;
 
      // region getters and setters
      public long getId() {
@@ -70,6 +87,14 @@ public class User {
 
      public void setAvatar(String avatar) {
           this.avatar = avatar;
+     }
+
+     public Role getRole() {
+          return role;
+     }
+
+     public void setRole(Role role) {
+          this.role = role;
      }
      // endregion
 

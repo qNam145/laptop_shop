@@ -32,12 +32,20 @@ public class UserController {
         this.roleService = roleService;
     }
 
+    /* ===================================================== */
+    /* =================== GET ALL USERS =================== */
+    /* ===================================================== */
+
     @RequestMapping("/admin/user")
     public String getUserPage(Model model) {
         List<User> users = userService.getAllUsers();
         model.addAttribute("users", users);
         return "admin/user/user-table";
     }
+
+    /* ===================================================== */
+    /* ==================== CREATE USER ==================== */
+    /* ===================================================== */
 
     @GetMapping(value = "/admin/user/create")
     public String getCreateUserPage(Model model) {
@@ -60,9 +68,13 @@ public class UserController {
         newUser.setPassword(password);
         newUser.setAvatar(avatar);
         newUser.setRole(this.roleService.findByName(newUser.getRole().getName()));
-        this.userService.saveUser(newUser);
+        this.userService.saveUser(newUser, avatar);
         return "redirect:/admin/user";
     }
+
+    /* ===================================================== */
+    /* ==================== DETAIL USER ==================== */
+    /* ===================================================== */
 
     @RequestMapping(value = "/admin/user/detail-user={id}")
     public String getUserDetailPage(Model model, @PathVariable long id) {
@@ -70,6 +82,10 @@ public class UserController {
         model.addAttribute("user", user);
         return "admin/user/user-detail";
     }
+
+    /* ===================================================== */
+    /* ==================== UPDATE USER ==================== */
+    /* ===================================================== */
 
     @GetMapping("/admin/user/update-user={id}")
     public String getUserUpdatePage(Model model, @PathVariable long id) {
@@ -79,8 +95,9 @@ public class UserController {
     }
 
     @PostMapping("/admin/user/update-user={id}")
-    public String updateUserPage(Model model, @ModelAttribute("newUser") @Valid User newUser,
-            BindingResult bindingResult, @PathVariable long id, MultipartFile file) {
+    public String updateUserPage(Model model, @ModelAttribute("newUser") @Valid User user,
+            BindingResult bindingResult, @PathVariable long id, @RequestParam("uploadFile") MultipartFile file) {
+        // validate
         List<FieldError> errors = bindingResult.getFieldErrors();
         for (FieldError error : errors) {
             System.out.println(error.getField() + " - " + error.getDefaultMessage());
@@ -88,19 +105,22 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return "admin/user/update-user";
         }
-        User user = userService.getUserById(id);
-        user.setEmail(newUser.getEmail());
-        user.setPhone(newUser.getPhone());
-        user.setFullName(newUser.getFullName());
-        user.setAddress(newUser.getAddress());
+        // save user
+        user.setRole(this.userService.getUserById(id).getRole());
         String avatar = uploadService.saveUploadFile(file, "avatar");
-        userService.saveUser(user);
+        if (!avatar.equals("")) {
+            user.setAvatar(avatar);
+        }
+        userService.saveUser(user, avatar);
         return "redirect:/admin/user";
     }
 
+    /* ===================================================== */
+    /* ==================== DELETE USER ==================== */
+    /* ===================================================== */
+
     @RequestMapping("/admin/user/delete-user={id}")
     public String getUserDeletePage(Model model, @PathVariable long id) {
-        User user = userService.getUserById(id);
         this.userService.removeUser(id);
         return "redirect:/admin/user";
     }

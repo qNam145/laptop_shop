@@ -1,7 +1,5 @@
 package vn.hoidanit.laptopshop.domain;
 
-import java.util.List;
-
 import jakarta.persistence.*;
 
 @Entity
@@ -20,6 +18,7 @@ public class OrderDetail {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
+
     // region getters and setters
     public long getId() {
         return id;
@@ -45,7 +44,7 @@ public class OrderDetail {
         this.price = price;
     }
 
-    // endregion
+    // endRegion
     @Override
     public String toString() {
         return "OrderDetail [id=" + id + ", quantity=" + quantity + ", price=" + price + "]";

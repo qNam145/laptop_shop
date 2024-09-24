@@ -2,9 +2,9 @@ package vn.hoidanit.laptopshop.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import vn.hoidanit.laptopshop.service.validator.StrongPassword;
 
 @Entity
 @Table(name = "users")
@@ -19,6 +19,7 @@ public class User {
 
      @NotNull
      @Size(min = 3, message = "Password must be at least 3 characters")
+     @StrongPassword
      private String password;
 
      @NotNull

@@ -28,7 +28,9 @@ public class ProductController {
         this.productService = productService;
     }
 
-   /* ==================== GET PRODUCT PAGE ==================== */
+    /* ======================================================== */
+    /* =================== GET PRODUCT PAGE =================== */
+    /* ======================================================== */
 
     @GetMapping("/admin/product")
     public String getUserPage(Model model) {
@@ -37,7 +39,9 @@ public class ProductController {
         return "admin/product/product-table";
     }
 
+    /* ======================================================== */
     /* ==================== CREATE PRODUCT ==================== */
+    /* ======================================================== */
 
     @GetMapping("/admin/product/create")
     public String getMethodName(Model model, @ModelAttribute("newProduct") Product product) {
@@ -57,11 +61,13 @@ public class ProductController {
         String img = uploadService.saveUploadFile(file, "product");
         product.setImage(img);
 
-        this.productService.saveProduct(product);
+        this.productService.saveProduct(product, img);
         return "redirect:/admin/product";
     }
 
+    /* ======================================================== */
     /* ==================== UPDATE PRODUCT ==================== */
+    /* ======================================================== */
 
     @GetMapping("/admin/product/update-product={id}")
     public String getUpdateProductPage(Model model, @PathVariable("id") Long id) {
@@ -71,13 +77,32 @@ public class ProductController {
     }
 
     @PostMapping("/admin/product/update-product={id}")
-    public String updateProduct(Model model, @PathVariable("id") Long id,
+    public String updateProduct(Model model,
             @ModelAttribute("product") @Valid Product product,
-            BindingResult productBindingResult, @RequestParam("productFile") MultipartFile file) {
-        if (productBindingResult.hasErrors()) {
-            return "/admin/product/update-product";
+            BindingResult bindingResult, @RequestParam("productFile") MultipartFile file) {
+        // validate
+        for (FieldError error : bindingResult.getFieldErrors()) {
+            System.out.println(error.getField() + " - " + error.getDefaultMessage());
         }
-//        String img
+        if (bindingResult.hasErrors()) {
+            return "admin/product/update-product";
+        }
+        // save
+        String img = uploadService.saveUploadFile(file, "product");
+        if (!img.equals("")) {
+            product.setImage(img);
+        }
+        productService.saveProduct(product, img);
+        return "redirect:/admin/product";
+    }
+
+    /* ======================================================== */
+    /* ==================== DELETE PRODUCT ==================== */
+    /* ======================================================== */
+
+    @GetMapping("/admin/product/delete-product={id}")
+    public String deleteProduct(Model model, @PathVariable("id") Long id) {
+        this.productService.removeProduct(id);
         return "redirect:/admin/product";
     }
 }

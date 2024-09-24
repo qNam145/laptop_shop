@@ -10,5 +10,4 @@ public class ItemController {
     public String getMethodName(@PathVariable long id) {
         return "/client/product/shop-detail";
     }
-
 }
